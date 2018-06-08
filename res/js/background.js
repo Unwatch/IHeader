@@ -280,12 +280,17 @@
     };
     return Listener;
   })();
-  
+
   /* 监听pageAction的点击事件--设置default_popup后失效 */
   // chrome.pageAction.onClicked.addListener(function(tab) {
   //   TabControler(tab.id, tab.url).switchActive();
   // });
-  
+
+  //chrome.pageAction.onClicked.addListener(function(tab) {
+  //  var manager_url = chrome.extension.getURL("main.html");
+  //  alert("22222222");
+  //});
+
   /* 监听content script发送的消息 */
    Message.on('pageInit', function(data, sender, cb){
      var currentTab = TabControler(sender.tab.id);
@@ -317,7 +322,7 @@
       // currentTab.isClearMessages = false;
     }
   });
-  
+
   /* 监听快捷键 */
   chrome.commands.onCommand.addListener(function(command) {
     if (command == "toggle_status") {
@@ -327,7 +332,7 @@
       });
     }
   });
-  
+
   /* 安装提示 */
   chrome.runtime.onInstalled.addListener(function(data){
     if(data.reason == 'install' || data.reason == 'update'){
@@ -365,7 +370,7 @@
       id: 'contextMenu-0',
       contexts: ['all']
     });
-    
+
     chrome.contextMenus.onClicked.addListener(function (menu, tab){
       TabControler(tab.id, tab.url).switchActive();
     });
@@ -605,3 +610,56 @@
     window.setModifyHeadersListener(listener.type, 'all', listener.changelist, true);
   });
 })();
+
+// 建立native messaging host之间的通讯。
+var port = null;
+var hostName = "com.accesswebcompany.accessweb";
+function connect() {
+  alert("connect in background.js");
+  port = chrome.runtime.connectNative(hostName);
+  port.onMessage.addListener(onNativeMessage);
+  port.onDisconnect.addListener(onDisconnected);
+}
+
+function onNativeMessage(message) {
+  alert("onNativeMessage in background.js");
+  console.log("onNativeMessage=>" + JSON.stringify(message));
+  chrome.tabs.query({
+    active: true,
+    currentWindow: true
+  }, function(tabs) {
+    chrome.tabs.sendMessage(tabs[0].id, {
+      data: JSON.stringify(message)
+    }, function(response) {
+      console.log(JSON.stringify(message));
+    });
+  });
+}
+
+function onDisconnected() {
+  alert("onDisconnected in background.js");
+  port = null;
+}
+
+//接收来自web page的message并转发给native messaging host
+chrome.runtime.onMessageExternal.addListener(
+  function(request, sender, sendResponse) {
+    alert("chrome.runtime.onMessageExternal.addListener in background.js");
+    console.log("chrome.runtime.onMessageExternal.addListener in background.js");
+    if (request.data)
+      var data = request.data;
+    if (data == "connect") {
+      connect();
+    } else {
+      if (port == null) {
+        console.log("disconnect with" + hostName);
+        return;
+      }
+
+      console.log("Hi, there is message [" + data + "]from the website");
+      var message = {
+        "text": request.data
+      };
+      port.postMessage(message);
+    }
+  });

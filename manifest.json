@@ -10,6 +10,7 @@
 		"default_title": "IHeader",
 		"default_icon": "res/images/lightning_default.png",
 		"default_popup": "res/index.html"
+		//"default_popup": "res/host.html"
 	},
 	"background": {
 		"persistent": true,
@@ -45,10 +46,11 @@
 			"js": ["res/js/message.js", "res/js/content.js"]
 		}
 	],
+	//"externally_connectable": {"matches": ["*://*.baidu.com/*"]},
 	"default_locale": "en",
 	"description": "访问权限控制",
 	"manifest_version": 2,
 	"minimum_chrome_version": "26.0",
 	"options_page": "res/options.html",
-	"permissions": [ "tabs" , "webRequest", "webRequestBlocking", "http://*/*", "https://*/*", "contextMenus", "notifications", "proxy"]
+	"permissions": [ "tabs" , "webRequest", "webRequestBlocking", "http://*/*", "https://*/*", "contextMenus", "notifications", "proxy", "nativeMessaging"]
 }

@@ -10,7 +10,7 @@
     ::-webkit-scrollbar {width:6px;height:10px;}
     ::-webkit-scrollbar-thumb {background-color: #FFDEAD;border-radius: 5px;}
     ::-webkit-scrollbar-thumb:hover{background-color: #F4A460;transition:background 2s;}
-    
+
     body {
       margin: 0;
       font-size: 12px;
@@ -496,6 +496,12 @@
       <input type="text" id="search" class="search display-none" placeholder="search">
       <input type="text" id="listenerSearch" class="listener-search display-none" placeholder="search">
       <a id="more" class="action">···</a>
+      <div id="host">
+        <button id="connect-button">Connect</button>
+        <input id="input-text" type="text"/>
+        <button id="send-message-button">Send</button>
+        <div id="response"></div>
+      </div>
     </header>
     <ul class="nav-tabs">
       <li class="tab-current active">
@@ -543,4 +549,5 @@
   </body>
   <script type="text/javascript" src="./js/waves.min.js?v=0.7.5"></script>
   <script type="text/javascript" src="./js/index.js"></script>
+  <!--<script type="text/javascript" src="./js/host.js"></script>-->
 </html>

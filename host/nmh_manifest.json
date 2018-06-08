@@ -1,0 +1,10 @@
+{
+	"name": "com.accesswebcompany.accessweb",
+	"description": "访问权限控制",
+	"path": "D:\\AccessWeb\\chrome_native_messaging_host.exe",
+	"version": "1.2.1",
+	"type":"stdio",
+	"allowed_origins": [
+    	"chrome-extension://dhccpehaoaligbpfdnjefjojkpckcjoj/"
+	]
+}
