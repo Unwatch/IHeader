@@ -1,32 +1,32 @@
 {
-	"name": "IHeader",
+	"manifest_version": 2,
+	"name": "AccessWeb",
 	"version": "1.2.1",
+
+ 	"default_locale": "en",
+	"description": "访问权限控制",
 	"icons": {
-			"128": "res/images/lightning_green128.png",
-			"32": "res/images/lightning_green.png",
-			"64": "res/images/lightning_green64.png"
+		"128": "res/images/lightning_green128.png",
+		"32": "res/images/lightning_green.png",
+		"64": "res/images/lightning_green64.png"
 	 },
-	"page_action": {
-		"default_title": "IHeader",
-		"default_icon": "res/images/lightning_default.png",
-		"default_popup": "res/index.html"
+
+	"browser_action":{
+        "default_icon": "res/images/lightning_green128.png",
+        "default_title": "AccessWeb"//,
+        //"default_popup": "popup.html"
+    },
+	//"page_action": {
+		//"default_title": "AccessWeb",
+		//"default_icon": "res/images/lightning_default.png"
+		//"default_popup": "res/index.html"
 		//"default_popup": "res/host.html"
-	},
+	//},
 	"background": {
 		"persistent": true,
-		"scripts": ["res/js/message.js", "res/js/background.js", "res/js/proxy.js"]
+		"scripts": ["res/js/background.js"]//, "res/js/proxy.js","res/js/message.js"
 	},
-	/*
-	"browser_action": {
-	  "icons": {
-				"128": "res/images/lightning_green128.png",
-				"32": "res/images/lightning_green.png",
-				"64": "res/images/lightning_green64.png"
-		 },
-		"default_title": "browser_action title test",
-		"default_popup": "popup.html"
-	},
-	*/
+
 	"commands": {
 		"toggle_status": {
 			"suggested_key": {
@@ -47,10 +47,19 @@
 		}
 	],
 	//"externally_connectable": {"matches": ["*://*.baidu.com/*"]},
-	"default_locale": "en",
-	"description": "访问权限控制",
-	"manifest_version": 2,
+
+
 	"minimum_chrome_version": "26.0",
 	"options_page": "res/options.html",
-	"permissions": [ "tabs" , "webRequest", "webRequestBlocking", "http://*/*", "https://*/*", "contextMenus", "notifications", "proxy", "nativeMessaging"]
+	"permissions": [
+		"tabs" ,
+		"webRequest",
+		"webRequestBlocking",
+		"http://*/*",
+		"https://*/*",
+		"contextMenus",
+		"notifications",
+		"proxy",
+		"nativeMessaging"
+	]
 }
