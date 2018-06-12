@@ -56,9 +56,11 @@ int _tmain(int argc, _TCHAR* argv[])
 			memset(pData, 0, bufSize + 1);  
 			cin.read(pData, bufSize);  
 
-			string response = "{\"echo\":";  
+			//string response = "{\"echo\":";  
+			//response.append(pData);  
+			//response.append("}");  
+			string response = "";  
 			response.append(pData);  
-			response.append("}");  
 
 			sendMessage(response);  
 

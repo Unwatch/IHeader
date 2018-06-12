@@ -8,36 +8,43 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 var port = null;
 var hostName = "com.accesswebcompany.accessweb";
 function connect() {
-  alert("connect in background.js");
+  alert("Connecting to native messaging host " + hostName + "in background.js");
   port = chrome.runtime.connectNative(hostName);
   port.onMessage.addListener(onNativeMessage);
   port.onDisconnect.addListener(onDisconnected);
 }
 
-//
-function sendNativeMessage() {
-  alert("native messaging host sendNativeMessage in host.js");
-  message = {
-    "text": document.getElementById('input-text').value
-  };
+//向native messaging host之间的发消息
+function sendNativeMessage(message) {
+  alert("sendNativeMessage in background.js");
+  console.log("sendNativeMessage in background.js");
   port.postMessage(message);
-  appendMessage("Sent message: <b>" + JSON.stringify(message) + "</b>");
+}
+
+function sendRequest() {
+    var xhr = new XMLHttpRequest();
+      //xhr.open("GET", requestUrl, true);
+      xhr.open("GET", "https://www.baidu.com/", true);
+
+
+      console.log(requestUrl+"  sendRequest  in background.js");
+      //xhr.onreadystatechange = function() {
+        //};
+      xhr.send();
 }
 
 //接收native host消息
 function onNativeMessage(message) {
   alert("onNativeMessage in background.js");
   console.log("onNativeMessage=>" + JSON.stringify(message));
-  chrome.tabs.query({
-    active: true,
-    currentWindow: true
-  }, function(tabs) {
-    chrome.tabs.sendMessage(tabs[0].id, {
-      data: JSON.stringify(message)
-    }, function(response) {
-      console.log(JSON.stringify(message));
-    });
-  });
+  sendRequest();
+}
+
+function onDisconnected() {
+  alert("native messaging host onDisconnected in host.js");
+  appendMessage("Failed to connect: " + chrome.runtime.lastError.message);
+  port = null;
+  //updateUiState();
 }
 //重定向请求
 /*
@@ -63,6 +70,8 @@ chrome.webRequest.onBeforeRequest.addListener(
   ["blocking"]);
 */
 
+var isNewRequset = true;
+var randomcode = "123";
 //修改request请求http header
 chrome.webRequest.onBeforeSendHeaders.addListener(
   function(details) {
@@ -76,7 +85,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     //}
     var exists = false;
     for (var i = 0; i < details.requestHeaders.length; ++i) {
-      if (details.requestHeaders[i].name === 'user') {
+      if (details.requestHeaders[i].name.toLowerCase() === 'user') {
         exists = true;
         details.requestHeaders[i].value = 'justin';
         break;
@@ -88,7 +97,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
 
     exists = false;
     for (var i = 0; i < details.requestHeaders.length; ++i) {
-      if (details.requestHeaders[i].name === 'mid') {
+      if (details.requestHeaders[i].name.toLowerCase() === 'mid') {
         exists = true;
         details.requestHeaders[i].value = '987654321';
         break;
@@ -98,16 +107,20 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
       details.requestHeaders.push({ name: 'mid', value: '987654321'});
     }
 
+    if (isNewRequset) {
+      randomcode = '123';
+    }
+
     exists = false;
     for (var i = 0; i < details.requestHeaders.length; ++i) {
-      if (details.requestHeaders[i].name === 'randomcode') {
+      if (details.requestHeaders[i].name.toLowerCase() === 'randomcode') {
         exists = true;
-        details.requestHeaders[i].value = '123456';
+        details.requestHeaders[i].value = randomcode;
         break;
       }
     }
     if (!exists) {//不存在就添加
-      details.requestHeaders.push({ name: 'randomcode', value: '123456'});
+      details.requestHeaders.push({ name: 'randomcode', value: randomcode});
     }
 
     return {requestHeaders: details.requestHeaders};
@@ -126,6 +139,7 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     //]},
   ["blocking", "requestHeaders"]);
 
+var requestUrl;
 //校验请求有效性
 chrome.webRequest.onHeadersReceived.addListener(
   function(details) {
@@ -133,24 +147,31 @@ chrome.webRequest.onHeadersReceived.addListener(
     //alert(details.url);
     console.log("chrome.webRequest.onHeadersReceived.addListener in background.js");
     console.log(details.url);
-
-    var isValid = true;
+    requestUrl = "";
     for (var i = 0; i < details.responseHeaders.length; ++i) {
-      if (details.responseHeaders[i].name === 'valid') {
-        isValid = false;
+      if (details.responseHeaders[i].name.toLowerCase() === 'randomcode') {
+        randomcode = details.responseHeaders[i].value;
+        console.log(randomcode);
+        requestUrl = details.url;
+        console.log(requestUrl+" randomcode chrome.webRequest.onHeadersReceived in background.js");
+        sendNativeMessage(randomcode);
+        //return {cancel: true};
         break;
       }
     }
 
     for (var i = 0; i < details.responseHeaders.length; ++i) {
-      if (details.responseHeaders[i].name === 'randomcode') {
-        isValid = false;
-        var randomcode = details.responseHeaders[i].value;
-        //details.url
+      if (details.responseHeaders[i].name.toLowerCase() === 'vaild') {
+        var vaild = details.responseHeaders[i].value;
+        console.log(vaild);
+        console.log(requestUrl+"  vaild  chrome.webRequest.onHeadersReceived in background.js");
+        isNewRequset = true;
+        return {cancel: true};
         break;
       }
     }
-
+    //return {cancel: true};
+    isNewRequset = false;
     return {responseHeaders : details.responseHeaders};
   },
   {urls: ["<all_urls>"]},
