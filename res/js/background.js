@@ -38,17 +38,17 @@ function sendRequest(requestUrl_host) {
       //};
       xhr.send();
     } else {
-        requestUrlCount = 0;
+      requestUrlCount = 0;
     }
   }
 }
 
 //接收native host消息
-function onNativeMessage(message) {
-  alert("onNativeMessage in background.js");
-  console.log("onNativeMessage=>" + JSON.stringify(message));
-  sendRequest(message);
-}
+//function onNativeMessage(message) {
+//  alert("onNativeMessage in background.js");
+//  console.log("onNativeMessage=>" + JSON.stringify(message));
+//  sendRequest(message);
+//}
 
 function onDisconnected() {
   alert("native messaging host onDisconnected in host.js");
@@ -89,6 +89,25 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
     //alert(details.url);
     console.log("chrome.webRequest.onBeforeSendHeaders.addListener in background.js");
     console.log(details.url);
+    var isWait = true;
+    chrome.runtime.sendNativeMessage(
+      'com.accesswebcompany.accessweb', {
+        text: "newcode"
+      },
+
+
+      function(message) { //收到返回消息后的处理函数
+        console.log("chrome.runtime.sendNativeMessage in background.js");
+        console.log("33333333  " + message);
+        //isWait = false;
+      });
+
+    while (isWait == false) {
+      return {
+        requestHeaders: details.requestHeaders
+      };
+    }
+
     //if (details.url !== "http://192.168.1.174:8000/agent_authority")
     //{
     //  return {requestHeaders: details.requestHeaders};
@@ -142,9 +161,9 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
       });
     }
 
-    return {
-      requestHeaders: details.requestHeaders
-    };
+    //return {
+    //  requestHeaders: details.requestHeaders
+    //};
   }, {
     urls: ["<all_urls>"]
   },
@@ -175,7 +194,7 @@ chrome.webRequest.onHeadersReceived.addListener(
         console.log(randomcode);
         requestUrl = details.url;
         console.log(requestUrl + " randomcode chrome.webRequest.onHeadersReceived in background.js");
-        sendNativeMessage(randomcode);
+        //sendNativeMessage(randomcode);
         //return {cancel: true};
         break;
       }
@@ -194,7 +213,7 @@ chrome.webRequest.onHeadersReceived.addListener(
       }
     }
     requestUrl = details.url;
-    sendNativeMessage(requestUrl);
+    //sendNativeMessage(requestUrl);
     return {
       cancel: true
     };

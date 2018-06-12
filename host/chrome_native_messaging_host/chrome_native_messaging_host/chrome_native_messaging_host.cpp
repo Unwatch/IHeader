@@ -7,7 +7,7 @@
 #include <stdio.h>  
 #include <fcntl.h>  
 #include <io.h>     
-
+#include <windows.h>
 //#include "SimpleLog.h"  
 #include <iostream>  
 #include <string>  
@@ -37,7 +37,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	_setmode(_fileno(stdin), O_BINARY);  
 	_setmode(_fileno(stdout), O_BINARY);  
 	_setmode(_fileno(stderr), O_BINARY);  
-
+	Sleep(9999);
 	int bufSize;  
 	do   
 	{  
