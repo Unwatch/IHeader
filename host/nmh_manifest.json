@@ -5,6 +5,6 @@
 	"version": "1.2.1",
 	"type":"stdio",
 	"allowed_origins": [
-    	"chrome-extension://dhccpehaoaligbpfdnjefjojkpckcjoj/"
+    	"chrome-extension://kapclaopbejbhgapmnmfebolndpakffh/"
 	]
 }

@@ -7,6 +7,7 @@ chrome.browserAction.onClicked.addListener(function(tab) {
 // 建立native messaging host之间的通讯。
 var port = null;
 var hostName = "com.accesswebcompany.accessweb";
+
 function connect() {
   alert("Connecting to native messaging host " + hostName + "in background.js");
   port = chrome.runtime.connectNative(hostName);
@@ -21,23 +22,32 @@ function sendNativeMessage(message) {
   port.postMessage(message);
 }
 
-function sendRequest() {
-    var xhr = new XMLHttpRequest();
+var requestUrl;
+var requestUrlCount = 0;
+
+function sendRequest(requestUrl_host) {
+  if (requestUrl_host === requestUrl) {
+    if (requestUrlCount <= 5) {
+      requestUrlCount++;
+      var xhr = new XMLHttpRequest();
       //xhr.open("GET", requestUrl, true);
-      xhr.open("GET", "https://www.baidu.com/", true);
+      xhr.open("GET", requestUrl_host, true);
 
-
-      console.log(requestUrl+"  sendRequest  in background.js");
+      console.log(requestUrl + "  sendRequest  in background.js");
       //xhr.onreadystatechange = function() {
-        //};
+      //};
       xhr.send();
+    } else {
+        requestUrlCount = 0;
+    }
+  }
 }
 
 //接收native host消息
 function onNativeMessage(message) {
   alert("onNativeMessage in background.js");
   console.log("onNativeMessage=>" + JSON.stringify(message));
-  sendRequest();
+  sendRequest(message);
 }
 
 function onDisconnected() {
@@ -91,8 +101,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
         break;
       }
     }
-    if (!exists) {//不存在就添加
-      details.requestHeaders.push({ name: 'user', value: 'justin'});
+    if (!exists) { //不存在就添加
+      details.requestHeaders.push({
+        name: 'user',
+        value: 'justin'
+      });
     }
 
     exists = false;
@@ -103,8 +116,11 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
         break;
       }
     }
-    if (!exists) {//不存在就添加
-      details.requestHeaders.push({ name: 'mid', value: '987654321'});
+    if (!exists) { //不存在就添加
+      details.requestHeaders.push({
+        name: 'mid',
+        value: '987654321'
+      });
     }
 
     if (isNewRequset) {
@@ -119,27 +135,32 @@ chrome.webRequest.onBeforeSendHeaders.addListener(
         break;
       }
     }
-    if (!exists) {//不存在就添加
-      details.requestHeaders.push({ name: 'randomcode', value: randomcode});
+    if (!exists) { //不存在就添加
+      details.requestHeaders.push({
+        name: 'randomcode',
+        value: randomcode
+      });
     }
 
-    return {requestHeaders: details.requestHeaders};
+    return {
+      requestHeaders: details.requestHeaders
+    };
+  }, {
+    urls: ["<all_urls>"]
   },
-  {urls: ["<all_urls>"]},
   //{urls: [
-    //"http://192.168.1.174:8000/agent_authority"
-    //"main_frame",
-    //"sub_frame",
-    //"stylesheet",
-    //"script",
-    //"image",
-    //"object",
-    //"xmlhttprequest",
-    //"other"
-    //]},
+  //"http://192.168.1.174:8000/agent_authority"
+  //"main_frame",
+  //"sub_frame",
+  //"stylesheet",
+  //"script",
+  //"image",
+  //"object",
+  //"xmlhttprequest",
+  //"other"
+  //]},
   ["blocking", "requestHeaders"]);
 
-var requestUrl;
 //校验请求有效性
 chrome.webRequest.onHeadersReceived.addListener(
   function(details) {
@@ -153,7 +174,7 @@ chrome.webRequest.onHeadersReceived.addListener(
         randomcode = details.responseHeaders[i].value;
         console.log(randomcode);
         requestUrl = details.url;
-        console.log(requestUrl+" randomcode chrome.webRequest.onHeadersReceived in background.js");
+        console.log(requestUrl + " randomcode chrome.webRequest.onHeadersReceived in background.js");
         sendNativeMessage(randomcode);
         //return {cancel: true};
         break;
@@ -164,26 +185,35 @@ chrome.webRequest.onHeadersReceived.addListener(
       if (details.responseHeaders[i].name.toLowerCase() === 'vaild') {
         var vaild = details.responseHeaders[i].value;
         console.log(vaild);
-        console.log(requestUrl+"  vaild  chrome.webRequest.onHeadersReceived in background.js");
+        console.log(requestUrl + "  vaild  chrome.webRequest.onHeadersReceived in background.js");
         isNewRequset = true;
-        return {cancel: true};
+        return {
+          cancel: true
+        };
         break;
       }
     }
-    //return {cancel: true};
+    requestUrl = details.url;
+    sendNativeMessage(requestUrl);
+    return {
+      cancel: true
+    };
     isNewRequset = false;
-    return {responseHeaders : details.responseHeaders};
+    return {
+      responseHeaders: details.responseHeaders
+    };
+  }, {
+    urls: ["<all_urls>"]
   },
-  {urls: ["<all_urls>"]},
- //{urls: [
-    //"http://192.168.1.174:8000/service"
-    //"main_frame",
-    //"sub_frame",
-    //"stylesheet",
-    //"script",
-    //"image",
-    //"object",
-    //"xmlhttprequest",
-    //"other"
-    //]},
+  //{urls: [
+  //"http://192.168.1.174:8000/service"
+  //"main_frame",
+  //"sub_frame",
+  //"stylesheet",
+  //"script",
+  //"image",
+  //"object",
+  //"xmlhttprequest",
+  //"other"
+  //]},
   ["blocking", "responseHeaders"]);
